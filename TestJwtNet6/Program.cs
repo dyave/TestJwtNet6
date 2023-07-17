@@ -7,6 +7,8 @@ using System.Text;
 using TestJwtNet6.Models;
 
 var builder = WebApplication.CreateBuilder(args);
+builder.Services.AddEndpointsApiExplorer();
+builder.Services.AddSwaggerGen();
 builder.Services.AddAuthentication(options =>
 {
     options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
@@ -28,8 +30,17 @@ builder.Services.AddAuthentication(options =>
 });
 builder.Services.AddAuthorization();
 var app = builder.Build();
+if (app.Environment.IsDevelopment())
+{
+    app.UseSwagger();
+    app.UseSwaggerUI();
+}
 app.UseHttpsRedirection();
-app.MapGet("/security/getMessage", () => "Hello World!").RequireAuthorization();
+app.MapGet("/security/getMessage", () => "Hello World!")
+    .RequireAuthorization()
+    .WithName("GetWeatherForecast");
+    //.WithOpenApi();
+
 app.MapPost("/security/createToken",
 [AllowAnonymous] (User user) =>
 {
